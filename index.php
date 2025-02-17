@@ -81,7 +81,6 @@
                 <li><a href="#">Home</a></li>
                 <li><a href="#">Profile</a></li>
                 <li><a href="#">Settings</a></li>
-                <li><a href="#">xd</a></li>
             </ul>
         </div>
         <div class="feed">
