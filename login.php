@@ -24,6 +24,14 @@ session_start();
             </div>
             <button type="submit" class="btn">Inloggen</button>
         </form>
+        <nav class="navbarinfo">
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="login.php">Inloggen</a></li>
+                <li><a href="register-form.php">Registreren</a></li>
+                <li><a href="informatie.php">Informatie</a></li>
+            </ul>
+        </nav>
         <?php
         
         if (isset($_SESSION['error_message'])) {

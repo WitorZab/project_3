@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'database/database.php';
-var_dump($_SESSION);
+
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -106,6 +106,14 @@ $messages = $stmt->fetchAll();
 </head>
 <body>
     <h1>Berichten</h1>
+    <nav class="navbarinfo">
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="login.php">Inloggen</a></li>
+                <li><a href="register-form.php">Registreren</a></li>
+                <li><a href="informatie.php">Informatie</a></li>
+            </ul>
+        </nav>
 
     
     <?php if (isset($_SESSION['success_message'])): ?>
