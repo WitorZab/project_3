@@ -2,6 +2,7 @@
 session_start();
 require 'database/database.php';
 
+include 'partials/header.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -95,25 +96,6 @@ $stmt = $conn->prepare("
 $stmt->execute();
 $messages = $stmt->fetchAll();
 ?>
-
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berichten</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Berichten</h1>
-    <nav class="navbarinfo">
-            <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="login.php">Inloggen</a></li>
-                <li><a href="register-form.php">Registreren</a></li>
-                <li><a href="informatie.php">Informatie</a></li>
-            </ul>
-        </nav>
 
     
     <?php if (isset($_SESSION['success_message'])): ?>

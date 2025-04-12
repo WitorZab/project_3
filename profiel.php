@@ -76,11 +76,12 @@ try {
 
 
     
-</header> 
+<header>
+    <title>Profiel</title>
+
 
 <main> 
     <div class="profile-container">
-        <h1>Welkom, <?= htmlspecialchars($user['gebruikersnaam']) ?>!</h1>
 
         <div class="profile-info">
             <p><strong>Gebruikersnaam:</strong> <?= htmlspecialchars($user['gebruikersnaam']) ?></p>
@@ -109,3 +110,5 @@ try {
 
 </body>
 </html>
+
+</header>
