@@ -1,0 +1,159 @@
+:root {
+    --primary-color: #1da1f2;
+    --primary-hover: #1991db;
+    --background: #f5f8fa;
+    --text-color: #14171a;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    background-color: var(--background);
+    color: var(--text-color);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main content container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    flex: 1;
+}
+
+/* Formulier voor berichten */
+form {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+textarea {
+    width: 100%;
+    max-width: 600px;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccd6dd;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+button {
+    padding: 0.8rem 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Success and error messages */
+.success, .error {
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
+message {
+    background-color: white;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.likes {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.likes a {
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.likes a:hover {
+    background-color: rgba(29, 161, 242, 0.1);
+}
+
+/* Verwijder knop */
+.message a {
+    color: #e0245e;
+    text-decoration: none;
+    margin-left: 1rem;
+    font-weight: bold;
+}
+
+.message a:hover {
+    text-decoration: underline;
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: auto;
+}
+
+footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+.delete-button {
+    background-color: #e0245e;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #c1354e;
+}
+
+.delete-button:active {
+    background-color: #a20f3c;
+}

@@ -5,7 +5,7 @@ $dbname = 'databse';
 $username = 'root'; 
 $password = ''; 
 
-header("location: login-form.php");
+
 try {
    
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

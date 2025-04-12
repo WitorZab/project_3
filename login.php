@@ -1,68 +1,79 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Login Pagina</title>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <div class="login-container">
-        <h2>Login</h2>
-        <form id="loginForm" method="POST">
+        <h2>Inloggen</h2>
+        <form id="loginForm" method="POST" action="login.php">
             <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <label for="username">Gebruikersnaam</label>
+                <input type="text" id="username" name="username" placeholder="Vul je gebruikersnaam in" required>
             </div>
             <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <label for="password">Wachtwoord</label>
+                <input type="password" id="password" name="password" placeholder="Vul je wachtwoord in" required>
             </div>
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn">Inloggen</button>
         </form>
-        <p id="error-message" class="error"></p>
-        <p>Don't have an account? <a href="#">Register here</a></p>
+        <?php
+        
+        if (isset($_SESSION['error_message'])) {
+            echo "<p class='error'>" . $_SESSION['error_message'] . "</p>";
+            unset($_SESSION['error_message']);
+        }
+        ?>
+        <p>Heb je nog geen account? <a href="#">Registreer hier</a></p>
     </div>
 
     <?php
-    // var_dump($_POST);
-// echo "test1";
-require "database/database.php";
-$stmt = $conn->prepare("SELECT * FROM users WHERE gebruikersnaam =:username");
-$stmt->bindParam(":username", $_POST['username']);
-$stmt->execute();
-$users = $stmt->fetchAll();
-// echo "test2";
-if (!$users) {
-    echo "Error: Gebruiker bestaat niet.";
-    // var_dump($users);
-    exit;
-} else {
-    echo "Gebruiker gevonden:";
-    // var_dump($users);
-}
-//check doen of user bestaat
-    //zo niet, error message
-//bestaat wel
+   
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        
+        require "database/database.php";
+        
+        
+        if (isset($_POST['username']) && isset($_POST['password'])) {
+           
+            $stmt = $conn->prepare("SELECT * FROM users WHERE gebruikersnaam = :username");
+            $stmt->bindParam(":username", $_POST['username']);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);  
 
-// echo "test3";
+            
+            if (!$user) {
+                $_SESSION['error_message'] = 'Fout: Gebruiker bestaat niet.';
+                header("Location: login.php");
+                exit;
+            } 
 
-$iscorrect = password_verify($_POST['password'], $users[0]['wachtwoord']);
-
-if(!$iscorrect){
-    echo "FOUT LOGIN";
-}
-else{
-    session_start();
-    $_SESSION['username'] = $users[0]['gebruikersnaam'];
-    // $_SESSION['userid'] = $users[0]['id'];
-    // header("location: index.php");
-    echo "SUCCESVOL INGELOGD";
-}
-
-
-?>
-
-    
+           
+            $iscorrect = password_verify($_POST['password'], $user['wachtwoord']);
+            if (!$iscorrect) {
+                $_SESSION['error_message'] = 'Fout login! Verkeerd wachtwoord.';
+                header("Location: login.php");
+                exit;
+            } else {
+                
+                $_SESSION['user_id'] = $user['gebruikersnaam'];
+               
+                header("Location: index.php");
+                exit;
+            }
+        } else {
+            $_SESSION['error_message'] = 'Vul zowel gebruikersnaam als wachtwoord in.';
+            header("Location: login.php");
+            exit;
+        }
+    }
+    ?>
 </body>
 </html>
