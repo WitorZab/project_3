@@ -4,7 +4,7 @@
 ?>
 
 <main>
-    
+<link rel="stylesheet" href="css/main.css">
     <div class="privacy-container">
         <h1>Privacyvoorwaarden</h1>
 

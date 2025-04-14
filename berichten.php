@@ -2,17 +2,20 @@
 session_start();
 require 'database/database.php';
 
-if (!isset($_SESSION['userid'])) {
+// Controleer of gebruiker is ingelogd
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-$user_id = $_SESSION['userid'];
+$user_id = $_SESSION['user_id'];
 
+// CSRF-token genereren
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Nieuw bericht posten
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['content'])) {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $_SESSION['error_message'] = "Ongeldige CSRF-token.";
@@ -34,8 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['content'])) {
     exit();
 }
 
-if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    $message_id = $_GET['delete'];
+// Bericht verwijderen
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete']) && is_numeric($_POST['delete'])) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $_SESSION['error_message'] = "Ongeldige CSRF-token.";
+        header("Location: berichten.php");
+        exit();
+    }
+
+    $message_id = $_POST['delete'];
 
     $stmt = $conn->prepare("SELECT user_id FROM messages WHERE id = ?");
     $stmt->execute([$message_id]);
@@ -44,42 +54,37 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     if ($message && $message['user_id'] == $user_id) {
         $stmt = $conn->prepare("DELETE FROM messages WHERE id = ?");
         $stmt->execute([$message_id]);
-
         $_SESSION['success_message'] = "Je bericht is verwijderd.";
     } else {
         $_SESSION['error_message'] = "Je mag alleen je eigen berichten verwijderen.";
     }
 
-    header("Location: berichten.php"); 
+    header("Location: berichten.php");
     exit();
 }
 
+// Bericht liken
 if (isset($_GET['like']) && is_numeric($_GET['like'])) {
     $message_id = (int)$_GET['like'];
-    
-    // Begin transaction
+
     $conn->beginTransaction();
     try {
-        // Check if message exists
         $check_msg = $conn->prepare("SELECT id FROM messages WHERE id = ?");
         $check_msg->execute([$message_id]);
         if (!$check_msg->fetch()) {
-            throw new Exception("Message not found");
+            throw new Exception("Bericht niet gevonden");
         }
 
-        // Check for existing like
         $check_like = $conn->prepare("SELECT id FROM likes WHERE message_id = ? AND user_id = ?");
         $check_like->execute([$message_id, $user_id]);
-        
+
         if (!$check_like->fetch()) {
-            // Add like
             $like_stmt = $conn->prepare("INSERT INTO likes (message_id, user_id) VALUES (?, ?)");
             $like_stmt->execute([$message_id, $user_id]);
-            
-            // Update message like count
+
             $update_stmt = $conn->prepare("UPDATE messages SET likes = (SELECT COUNT(*) FROM likes WHERE message_id = ?) WHERE id = ?");
             $update_stmt->execute([$message_id, $message_id]);
-            
+
             $conn->commit();
             $_SESSION['success_message'] = "Je hebt het bericht geliked!";
         } else {
@@ -90,51 +95,50 @@ if (isset($_GET['like']) && is_numeric($_GET['like'])) {
         $conn->rollBack();
         $_SESSION['error_message'] = "Er ging iets mis met liken.";
     }
-    
+
     header("Location: berichten.php");
     exit();
 }
 
+// Bericht unliken
 if (isset($_GET['unlike']) && is_numeric($_GET['unlike'])) {
     $message_id = $_GET['unlike'];
-    
-    // Begin transaction
+
     $conn->beginTransaction();
     try {
-        // Remove specific like
         $delete_stmt = $conn->prepare("DELETE FROM likes WHERE message_id = ? AND user_id = ?");
         $delete_stmt->execute([$message_id, $user_id]);
-        
-        // Update ONLY this message's like count
+
         $update_stmt = $conn->prepare("UPDATE messages SET likes = (SELECT COUNT(*) FROM likes WHERE message_id = ?) WHERE id = ?");
         $update_stmt->execute([$message_id, $message_id]);
-        
+
         $conn->commit();
     } catch (Exception $e) {
         $conn->rollBack();
         $_SESSION['error_message'] = "Er ging iets mis met unliken.";
     }
-    
+
     header("Location: berichten.php");
     exit();
 }
 
+// Gebruiker ophalen
 $stmt = $conn->prepare("SELECT gebruikersnaam FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
+// Berichten ophalen
 $stmt = $conn->prepare("
     SELECT 
-        m.*, 
+        m.id,
+        m.content,
+        m.user_id,
         u.gebruikersnaam,
         (SELECT COUNT(*) FROM likes WHERE message_id = m.id) as like_count,
         EXISTS(SELECT 1 FROM likes WHERE message_id = m.id AND user_id = ?) as user_liked
-    FROM 
-        messages m
-    LEFT JOIN 
-        users u ON m.user_id = u.id
-    ORDER BY 
-        m.id DESC
+    FROM messages m
+    LEFT JOIN users u ON m.user_id = u.id
+    ORDER BY m.id DESC
 ");
 $stmt->execute([$user_id]);
 $messages = $stmt->fetchAll();
@@ -144,20 +148,20 @@ $messages = $stmt->fetchAll();
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Berichten</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <h1>Berichten</h1>
     <nav class="navbarinfo">
-            <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="login.php">Inloggen</a></li>
-                <li><a href="register-form.php">Registreren</a></li>
-                <li><a href="informatie.php">Informatie</a></li>
-            </ul>
-        </nav>
+        <ul>
+            <li><a href="index.php">Home</a></li>
+            <li><a href="login.php">Inloggen</a></li>
+            <li><a href="register-form.php">Registreren</a></li>
+            <li><a href="informatie.php">Informatie</a></li>
+            <li><a href="berichten.php">Berichten</a></li>
+        </ul>
+    </nav>
 
     <?php if (isset($_SESSION['success_message'])): ?>
         <div class="success"><?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
@@ -184,16 +188,19 @@ $messages = $stmt->fetchAll();
                 <p><?php echo htmlspecialchars($message['content']); ?></p>
                 <p>Geplaatst door: <?php echo htmlspecialchars($message['gebruikersnaam']); ?></p>
                 <p>Likes: <?php echo $message['like_count']; ?></p>
-
+                
+                <!-- Like/Unlike knop -->
                 <?php if ($message['user_liked']): ?>
                     <a href="berichten.php?unlike=<?php echo $message['id']; ?>" class="unlike-button">Unlike</a>
                 <?php else: ?>
                     <a href="berichten.php?like=<?php echo $message['id']; ?>" class="like-button">Like</a>
                 <?php endif; ?>
 
-                <?php if ($message['user_id'] == $user_id): ?>
-                    <form action="berichten.php" method="GET" onsubmit="return confirm('Weet je zeker dat je dit bericht wilt verwijderen?');">
+                <!-- Verwijder knop (alleen voor berichten van de gebruiker zelf) -->
+                <?php if ((int)$message['user_id'] === (int)$user_id): ?>
+                    <form method="POST" style="display: inline;">
                         <input type="hidden" name="delete" value="<?php echo $message['id']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                         <button type="submit" class="delete-button">Verwijderen</button>
                     </form>
                 <?php endif; ?>
@@ -202,6 +209,5 @@ $messages = $stmt->fetchAll();
     <?php endif; ?>
 
     <p><a href="index.php">Terug naar home</a></p>
-
 </body>
 </html>

@@ -1,5 +1,5 @@
 <?php include "partials/header.php"; ?>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="main.css">
 <body>
     <div class="container">
 
