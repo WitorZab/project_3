@@ -1,5 +1,5 @@
 <?php include "partials/header.php"; ?>
-
+<h1>Registratie formulier</h1>
 
 <div class="container">
     <div class="registration-container">
@@ -18,4 +18,4 @@
     </div>
 </div>
 
-<?php include "partials/footer.php"; ?>
+<?php 

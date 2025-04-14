@@ -16,10 +16,14 @@ session_start();
         <h1>Welkom bij Chirpify!</h1>
         <nav class="navbarinfo">
             <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="login.php">Inloggen</a></li>
-                <li><a href="register-form.php">Registreren</a></li>
-                <li><a href="informatie.php">Informatie</a></li>
+            <li><a href="index.php" class="index.php">Home</a></li>
+                    <li><a href="login.php" class="login.php">Inloggen</a></li>
+                    <li><a href="profiel.php" class="">profiel</a></li>
+                    <li><a href="register-form.php" class="register-form.php">Registreren</a></li>
+                    <li><a href="page.php" class="main.php">Main page</a></li>
+                    <li><a href="privecy.php" class="privecy.php">Privacy</a></li>
+                    <li><a href="berichten.php" class="berichten.php">berichten</a></li>
+                    <li><a href="informatie.php" class="informatie">informatie</a></li>
             </ul>
         </nav>
     </header>

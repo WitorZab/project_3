@@ -2,7 +2,6 @@
 
 session_start();
 require "database/database.php";
-var_dump($_SESSION);
 
 if (!isset($_SESSION['user_id'])) {
     header("location: login.php");
@@ -11,9 +10,7 @@ if (!isset($_SESSION['user_id'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-
 $user_id = (int) $_SESSION['user_id'];  
-
 
 require "database/database.php";
 
@@ -50,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = :user_id");
 $stmt->setFetchMode(PDO::FETCH_ASSOC);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -59,11 +55,10 @@ try {
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user) {
-        
+    if ($user !== false && isset($user['gebruikersnaam'])) {
         echo "Welkom, " . htmlspecialchars($user['gebruikersnaam']);
     } else {
-        echo "Geen gebruiker gevonden.";
+        
     }
 } catch (PDOException $e) {
     echo "Fout bij uitvoeren query: " . $e->getMessage();
@@ -71,33 +66,25 @@ try {
 }
 
 ?>
-<?php include "partials/header.php"; ?>
 
-
-
-    
-<header>
-    <title>Profiel</title>
-
+</header> 
 
 <main> 
+    <link rel="stylesheet" href="style.css">
     <div class="profile-container">
+        <h1>Welkom, <?= isset($user['gebruikersnaam']) ? htmlspecialchars($user['gebruikersnaam']) : 'Onbekend' ?>!</h1>
 
         <div class="profile-info">
-            <p><strong>Gebruikersnaam:</strong> <?= htmlspecialchars($user['gebruikersnaam']) ?></p>
-          
+            <p><strong>Gebruikersnaam:</strong> <?= isset($user['gebruikersnaam']) ? htmlspecialchars($user['gebruikersnaam']) : 'Onbekend' ?></p>
         </div>
-
-
 
         <h2>Profiel bewerken</h2>
         <form method="post">
-              
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
             <div class="input-group">
                 <label for="gebruikersnaam">Nieuwe gebruikersnaam</label>
-                <input type="text" name="gebruikersnaam" id="gebruikersnaam" value="<?= htmlspecialchars($user['gebruikersnaam']) ?>" required>
+                <input type="text" name="gebruikersnaam" id="gebruikersnaam" value="<?= isset($user['gebruikersnaam']) ? htmlspecialchars($user['gebruikersnaam']) : '' ?>" required>
             </div>
             <div class="input-group">
                 <label for="wachtwoord">Nieuw wachtwoord</label>
@@ -110,5 +97,3 @@ try {
 
 </body>
 </html>
-
-</header>

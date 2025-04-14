@@ -1,8 +1,15 @@
 <?php
 session_start();
-
-include "partials/header.php";
 ?>
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Pagina</title>
+    <link rel="stylesheet" href="main.css">
+</head>
 <body>
     <div class="login-container">
         <h2>Inloggen</h2>
@@ -17,7 +24,14 @@ include "partials/header.php";
             </div>
             <button type="submit" class="btn">Inloggen</button>
         </form>
-       
+        <nav class="navbarinfo">
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="login.php">Inloggen</a></li>
+                <li><a href="register-form.php">Registreren</a></li>
+                <li><a href="informatie.php">Informatie</a></li>
+            </ul>
+        </nav>
         <?php
         
         if (isset($_SESSION['error_message'])) {
@@ -59,7 +73,7 @@ include "partials/header.php";
                 
                 $_SESSION['user_id'] = $user['gebruikersnaam'];
                
-                header("Location: page.php");
+                header("Location: index.php");
                 exit;
             }
         } else {
