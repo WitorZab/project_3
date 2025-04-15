@@ -2,6 +2,7 @@
 
 session_start();
 require "database/database.php";
+include "partials/header.php";
 
 if (!isset($_SESSION['user_id'])) {
     header("location: login.php");
@@ -77,13 +78,7 @@ try {
         <div class="profile-info">
             <p><strong>Gebruikersnaam:</strong> <?= isset($user['gebruikersnaam']) ? htmlspecialchars($user['gebruikersnaam']) : 'Onbekend' ?></p>
         </div>
-        <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="login.php">Inloggen</a></li>
-                <li><a href="register-form.php">Registreren</a></li>
-                <li><a href="informatie.php">Informatie</a></li>
-            </ul>
-
+      
         <h2>Profiel bewerken</h2>
         <form method="post">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">

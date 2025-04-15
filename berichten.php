@@ -1,6 +1,10 @@
 <?php
 session_start();
+include 'partials/header.php';
+
 require 'database/database.php';
+
+
 
 // Controleer of gebruiker is ingelogd
 if (!isset($_SESSION['user_id'])) {
@@ -144,25 +148,9 @@ $stmt->execute([$user_id]);
 $messages = $stmt->fetchAll();
 ?>
 
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <title>Berichten</title>
-    <link rel="stylesheet" href="css/main.css">
-</head>
-<body>
+<div class="container">
     <h1>Berichten</h1>
-    <nav class="navbarinfo">
-        <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="login.php">Inloggen</a></li>
-            <li><a href="register-form.php">Registreren</a></li>
-            <li><a href="informatie.php">Informatie</a></li>
-            <li><a href="berichten.php">Berichten</a></li>
-        </ul>
-    </nav>
-
+   
     <?php if (isset($_SESSION['success_message'])): ?>
         <div class="success"><?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
     <?php endif; ?>
@@ -171,43 +159,45 @@ $messages = $stmt->fetchAll();
         <div class="error"><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></div>
     <?php endif; ?>
 
-    <h2>Plaats een nieuw bericht</h2>
-    <form action="berichten.php" method="POST">
-        <textarea name="content" rows="4" cols="50" placeholder="Wat wil je delen?" required></textarea><br>
+    <form action="berichten.php" method="POST" class="message-form">
+        <textarea name="content" placeholder="Wat wil je delen?" required></textarea>
         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-        <button type="submit">Bericht plaatsen</button>
+        <button type="submit" class="btn">Plaatsen</button>
     </form>
 
-    <h2>Alle berichten</h2>
+    <div class="messages">
+        <?php if (empty($messages)): ?>
+            <p>Geen berichten gevonden.</p>
+        <?php else: ?>
+            <?php foreach ($messages as $message): ?>
+                <div class="message">
+                    <p class="message-content"><?php echo htmlspecialchars($message['content']); ?></p>
+                    <div class="message-meta">
+                        <span>Door: <?php echo htmlspecialchars($message['gebruikersnaam']); ?></span>
+                        <span>Likes: <?php echo $message['like_count']; ?></span>
+                    </div>
+                    <div class="message-actions">
+                        <?php if ($message['user_liked']): ?>
+                            <a href="berichten.php?unlike=<?php echo $message['id']; ?>" class="btn">Unlike</a>
+                        <?php else: ?>
+                            <a href="berichten.php?like=<?php echo $message['id']; ?>" class="btn">Like</a>
+                        <?php endif; ?>
 
-    <?php if (empty($messages)): ?>
-        <p>Geen berichten gevonden.</p>
-    <?php else: ?>
-        <?php foreach ($messages as $message): ?>
-            <div class="message">
-                <p><?php echo htmlspecialchars($message['content']); ?></p>
-                <p>Geplaatst door: <?php echo htmlspecialchars($message['gebruikersnaam']); ?></p>
-                <p>Likes: <?php echo $message['like_count']; ?></p>
-                
-                <!-- Like/Unlike knop -->
-                <?php if ($message['user_liked']): ?>
-                    <a href="berichten.php?unlike=<?php echo $message['id']; ?>" class="unlike-button">Unlike</a>
-                <?php else: ?>
-                    <a href="berichten.php?like=<?php echo $message['id']; ?>" class="like-button">Like</a>
-                <?php endif; ?>
+                        <?php if ((int)$message['user_id'] === (int)$user_id): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="delete" value="<?php echo $message['id']; ?>">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                <button type="submit" class="btn delete-button">Verwijderen</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 
-                <!-- Verwijder knop (alleen voor berichten van de gebruiker zelf) -->
-                <?php if ((int)$message['user_id'] === (int)$user_id): ?>
-                    <form method="POST" style="display: inline;">
-                        <input type="hidden" name="delete" value="<?php echo $message['id']; ?>">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                        <button type="submit" class="delete-button">Verwijderen</button>
-                    </form>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+    <p><a href="index.php" class="btn">Terug naar home</a></p>
+</div>
 
-    <p><a href="index.php">Terug naar home</a></p>
 </body>
 </html>

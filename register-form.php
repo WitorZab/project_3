@@ -1,21 +1,21 @@
 <?php include "partials/header.php"; ?>
-<h1>Registratie formulier</h1>
 
-<div class="container">
-    <div class="registration-container">
-        <h1>Registratie formulier</h1>
+<div class="form-wrapper">
+    <div class="form-container">
+        <h2>Create Account</h2>
         <form action="register-database.php" method="post">
             <div class="input-group">
-                <label for="gebruikersnaam">Uw gebruikersnaam</label>
-                <input type="text" name="gebruikersnaam" id="gebruikersnaam" placeholder="Johndoe">
+                <label for="gebruikersnaam">Username</label>
+                <input type="text" name="gebruikersnaam" id="gebruikersnaam" placeholder="Enter your username" required>
             </div>
             <div class="input-group">
-                <label for="wachtwoord">Uw wachtwoord</label>
-                <input type="password" name="wachtwoord" id="wachtwoord">
+                <label for="wachtwoord">Password</label>
+                <input type="password" name="wachtwoord" id="wachtwoord" placeholder="Enter your password" required>
             </div>
-            <button type="submit" class="btn">Maak nu een account aan</button>
+            <button type="submit" class="btn btn-primary">Create Account</button>
         </form>
+        <p class="login-link">Already have an account? <a href="login.php">Sign in</a></p>
     </div>
 </div>
 
-<?php 
+<?php include "partials/footer.php"; ?>

@@ -1,5 +1,7 @@
 <?php
 session_start();
+include 'partials/header.php';
+
 require 'database/database.php';
 
 // Controleer of de gebruiker is ingelogd
@@ -101,15 +103,7 @@ $messages = $stmt->fetchAll();
 </head>
 <body>
     <h1>Berichten</h1>
-    <nav class="navbarinfo">
-        <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="login.php">Inloggen</a></li>
-            <li><a href="register-form.php">Registreren</a></li>
-            <li><a href="informatie.php">Informatie</a></li>
-            <li><a href="berichten.php">Berichten</a></li>
-        </ul>
-    </nav>
+    
 
     <?php if (isset($_SESSION['success_message'])): ?>
         <div class="success"><?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
